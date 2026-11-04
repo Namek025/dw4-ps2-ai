@@ -1,0 +1,293 @@
+name: Digimon World 4 (NTSC-U, SLUS-20836)
+# SHA-1 of the objcopy'd "rom" (loadable bytes only, no ELF metadata).
+# The ELF itself is d6c8bbcd6b3a0b3f135f7559d098af088ba06e2a.
+sha1: ffad4dab663cb290190bdfa34a8016d616a1652a
+options:
+  basename: SLUS_208.36
+  base_path: ..
+  target_path: build/target/SLUS_208.36.rom
+  elf_path: build/SLUS_208.36.elf
+  platform: ps2
+  compiler: EEGCC
+
+  gp_value: 0x0055C870
+
+  asm_path: asm
+  src_path: src
+  build_path: build
+  ld_script_path: build/SLUS_208.36.ld
+
+  ld_dependencies: True
+  ld_wildcard_sections: True
+  ld_bss_contains_common: True
+  create_asm_dependencies: True
+  find_file_boundaries: False
+  o_as_suffix: True
+
+  symbol_addrs_path:
+    - config/symbol_addrs.txt
+  undefined_funcs_auto_path: config/undefined_funcs_auto.txt
+  undefined_syms_auto_path: config/undefined_syms_auto.txt
+  # include/ is hand-maintained (include_asm.h has an MWCC branch); do not regenerate.
+  generate_asm_macros_files: False
+  # Also write matched functions (to asm/matchings/): objdiff builds its target objects from them.
+  disassemble_all: True
+  # Unit .rodata is emitted by tools/mwsplice.py, not split into per-symbol files.
+  migrate_rodata_to_functions: False
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+  named_regs_for_c_funcs: False
+  add_set_gp_64: True
+
+  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]
+  auto_link_sections: [.data, .rodata, .sdata, .sbss, .bss]
+
+segments:
+  - name: main
+    type: code
+    start: 0x000000
+    vram: 0x00100000
+    bss_size: 0x38780
+    subalign: 8  # GCC aligns functions to 8 (.p2align 3); modern gas marks .text as 16
+    subsegments:
+      # Main MIPS code. Last function ends with jr $ra at 0x467114.
+      # Provisional chunks cut at function starts so the build runs in parallel;
+      # they will be replaced by real translation units as we find them.
+      - [0x000000, asm, text/100000]
+      - [0x030020, cpp, alchemy/meta_igVisualContextAttrDefaultManager]  # meta registration (tools/meta_blocks.py)
+      - [0x032080, asm, text/132080]
+      - [0x032420, cpp, alchemy/meta_igTextureCubeAttr]  # meta registration (tools/meta_blocks.py)
+      - [0x03B6A0, asm, text/13B6A0]
+      - [0x0425F0, cpp, alchemy/meta_1425F0]  # meta registration (tools/meta_blocks.py)
+      - [0x042CE0, asm, text/142CE0]
+      - [0x045B70, cpp, alchemy/meta_igWindow]  # meta registration (tools/meta_blocks.py)
+      - [0x047430, asm, text/147430]
+      - [0x049C30, cpp, alchemy/meta_igVisualContextCapabilityManager]  # meta registration (tools/meta_blocks.py)
+      - [0x050810, asm, text/150810]
+      - [0x0511A0, cpp, alchemy/meta_igPsx2VisualContext]  # meta registration (tools/meta_blocks.py)
+      - [0x054860, asm, text/154860]
+      - [0x06CE90, asm, text/16CE90]
+      - [0x080D90, cpp, alchemy/meta_180D90]  # meta registration (tools/meta_blocks.py)
+      - [0x081110, asm, text/181110]
+      - [0x086A80, cpp, alchemy/meta_igVolume]  # meta registration (tools/meta_blocks.py)
+      - [0x08A8F0, asm, text/18A8F0]
+      - [0x093D00, cpp, alchemy/meta_193D00]  # meta registration (tools/meta_blocks.py)
+      - [0x093F50, asm, text/193F50]
+      - [0x094A90, cpp, alchemy/meta_igTransientShaderData]  # meta registration (tools/meta_blocks.py)
+      - [0x096CB0, asm, text/196CB0]
+      - [0x097360, cpp, alchemy/meta_igSorter]  # meta registration (tools/meta_blocks.py)
+      - [0x09A890, asm, text/19A890]
+      - [0x09C3F0, cpp, alchemy/meta_igPlanarShadowShader]  # meta registration (tools/meta_blocks.py)
+      - [0x09FE70, asm, text/19FE70]
+      - [0x0A1170, cpp, alchemy/meta_igFrustCullTraversal]  # meta registration (tools/meta_blocks.py)
+      - [0x0A2B40, asm, text/1A2B40]
+      - [0x0A3580, asm, text/1A3580]
+      - [0x0A3DD0, cpp, alchemy/meta_igCommonTraversal]  # meta registration (tools/meta_blocks.py)
+      - [0x0A7820, asm, text/1A7820]
+      - [0x0A7B00, cpp, alchemy/meta_igAnimationDatabase]  # meta registration (tools/meta_blocks.py)
+      - [0x0AAE40, asm, text/1AAE40]
+      - [0x0DA220, asm, text/1DA220]
+      - [0x0E3500, cpp, alchemy/meta_1E3500]  # meta registration (tools/meta_blocks.py)
+      - [0x0E3CE0, asm, text/1E3CE0]
+      - [0x0E4010, cpp, alchemy/meta_igLongStack]  # meta registration (tools/meta_blocks.py)
+      - [0x0E5DE0, asm, text/1E5DE0]
+      - [0x0E7050, cpp, alchemy/meta_1E7050]  # meta registration (tools/meta_blocks.py)
+      - [0x0E7450, asm, text/1E7450]
+      - [0x110500, asm, text/210500]
+      - [0x125870, cpp, alchemy/meta_igCompoundList]  # meta registration (tools/meta_blocks.py)
+      - [0x1284A0, asm, text/2284A0]
+      - [0x128900, cpp, alchemy/meta_igItemBase]  # meta registration (tools/meta_blocks.py)
+      - [0x1294F0, asm, text/2294F0]
+      - [0x12CA00, cpp, alchemy/meta_22CA00]  # meta registration (tools/meta_blocks.py)
+      - [0x12CDB0, asm, text/22CDB0]
+      - [0x131010, cpp, alchemy/meta_igSerialScheduler]  # meta registration (tools/meta_blocks.py)
+      - [0x1328E0, asm, text/2328E0]
+      - [0x132DE0, cpp, alchemy/meta_igInsightCore]  # meta registration (tools/meta_blocks.py)
+      - [0x133C10, asm, text/233C10]
+      - [0x138BF0, cpp, alchemy/meta_igSearchSceneGraph]  # meta registration (tools/meta_blocks.py)
+      - [0x13AC20, asm, text/23AC20]
+      - [0x13C390, cpp, alchemy/meta_igLuaState]  # meta registration (tools/meta_blocks.py)
+      - [0x13C860, asm, text/23C860]
+      - [0x146A90, asm, text/246A90]
+      # Lua 4.0.1, one unit per source file in link (alphabetical) order. MWCC C++, see docs/lua.md.
+      - [0x146D30, c, lua/lapi]
+      - [0x147EF0, c, lua/lib/lauxlib]
+      - [0x148720, c, lua/lib/lbaselib]
+      - [0x14A050, c, lua/lcode]
+      - [0x14B620, c, lua/ldebug]
+      - [0x14C2E0, c, lua/ldo]
+      - [0x14CDE0, c, lua/lfunc]
+      - [0x14D0D0, c, lua/lgc]
+      - [0x14DC80, c, lua/llex]
+      - [0x14F740, c, lua/lib/lmathlib]
+      - [0x150150, c, lua/lmem]
+      - [0x150310, c, lua/lobject]
+      - [0x1506D0, c, lua/lparser]
+      - [0x152F70, c, lua/lstate]
+      - [0x153270, c, lua/lstring]
+      - [0x153820, c, lua/lib/lstrlib]
+      - [0x1555B0, c, lua/ltable]
+      - [0x156070, c, lua/ltm]
+      - [0x156680, c, lua/lundump]
+      - [0x157370, c, lua/lvm]
+      - [0x158F90, c, lua/lzio]
+      - [0x1590C0, asm, text/2590C0]
+      - [0x17D1E0, asm, text/27D1E0]
+      - [0x1B38B0, asm, text/2B38B0]
+      - [0x1B4330, c, unk_2B4330]  # built with -fno-delayed-branch, unlike its neighbours
+      - [0x1B4358, c, unk_2B4358]
+      - [0x1B5B68, asm, text/2B5B68]
+      - [0x1B5DA0, cpp, alchemy/meta_igVirtualCFuncMetaField]  # meta registration (tools/meta_blocks.py)
+      - [0x1C38C0, asm, text/2C38C0]
+      - [0x1C3DE0, cpp, alchemy/meta_igIGBFile]  # meta registration (tools/meta_blocks.py)
+      - [0x1C8120, asm, text/2C8120]
+      - [0x1C8450, cpp, alchemy/meta_igDataList]  # meta registration (tools/meta_blocks.py)
+      - [0x1CBE70, asm, text/2CBE70]
+      - [0x1CC090, cpp, alchemy/meta_igCharMetaField]  # meta registration (tools/meta_blocks.py)
+      - [0x1CD990, asm, text/2CD990]
+      - [0x1CDBD0, cpp, alchemy/meta_igArenaMemoryPool]  # meta registration (tools/meta_blocks.py)
+      - [0x1D0550, asm, text/2D0550]
+      - [0x1E5F70, cpp, alchemy/igIGBFile]  # Alchemy IGB reader: readFile and its phases (MWCC C++)
+      - [0x1EA040, asm, text/2EA040]
+      - [0x2087A0, cpp, alchemy/igResource]  # Alchemy resource manager (MWCC C++)
+      - [0x20A300, asm, text/30A300]
+      - [0x220780, asm, text/320780]
+      - [0x230E60, cpp, alchemy/meta_330E60]  # meta registration (tools/meta_blocks.py)
+      - [0x2314C0, asm, text/3314C0]
+      - [0x231530, cpp, alchemy/meta_331530]  # meta registration (tools/meta_blocks.py)
+      - [0x231A50, asm, text/331A50]
+      - [0x231B90, cpp, alchemy/meta_331B90]  # meta registration (tools/meta_blocks.py)
+      - [0x231D00, asm, text/331D00]
+      # Meta registration of the Bec library (like libNdmwRuntimePlugin): every class's
+      # _register / _registerFields from igAdx_register, then getMeta / getElementType of the
+      # data-only classes, up to script_bind. Built with tools/meta_src.py.
+      - [0x234510, cpp, libBecRuntimePlugin]
+      - [0x270780, cpp, script_bind]  # Lua command dispatcher + 116 implementations (MWCC C++)
+      - [0x275DF0, cpp, beAction2]  # (propose_units) starts with be_getMeta
+      - [0x278420, cpp, beActionStarter]  # effects started by broadcast actions (MWCC C++)
+      - [0x278700, cpp, beBaseInfoManager]  # base of the game's managers (MWCC C++)
+      - [0x278CE0, cpp, beBkColor]  # screen clear color (MWCC C++)
+      # Units below marked (propose_units) were cut at the first named method of each class
+      # (tools/propose_units.py); a unit's first unnamed functions may belong to the previous one.
+      - [0x278D80, cpp, beCameraCtrl]  # (propose_units)
+      - [0x27A690, cpp, beCameraMode]  # camera along a graph path (MWCC C++)
+      - [0x27AA70, cpp, beChangePosTransform]  # (propose_units)
+      - [0x27B7A0, cpp, beCri]  # (propose_units)
+      - [0x27EAD0, cpp, beDemoManager]  # (propose_units)
+      - [0x27F1B0, cpp, beFileListInfoManager]  # stage file loading state machine (MWCC C++)
+      - [0x2819A0, cpp, beFont]  # (propose_units) includes beUnicodeObj
+      - [0x2844A0, cpp, beGenerater]  # (propose_units)
+      - [0x285830, cpp, beHitLandDeliv]  # (propose_units)
+      - [0x286060, cpp, beHitLandModel]  # (propose_units)
+      - [0x289020, cpp, beKeyboardReceiver]  # (propose_units)
+      - [0x289080, cpp, beLayerCtl]  # (propose_units)
+      - [0x28A360, cpp, beLua]  # (propose_units)
+      - [0x28ACA0, cpp, beMatCtrl]  # (propose_units) starts with unnamed helpers on beMatCtrl's _wk* fields
+      - [0x28BEE0, cpp, beMessenger]  # message system (MWCC C++)
+      - [0x28F970, cpp, beMeterCtrl]
+      - [0x2915A0, asm, text/3915A0]
+      - [0x295B50, cpp, beModelCtrl]  # (propose_units)
+      - [0x29AE50, cpp, bePadData]  # (propose_units)
+      - [0x29B2E0, cpp, bePadManager]  # (propose_units)
+      - [0x29B880, cpp, beParticleCtrl2]  # (propose_units)
+      - [0x29C160, cpp, bePoint01]  # player points (MWCC C++)
+      - [0x29C430, cpp, beSeCtl]  # sound effects bound to actions (MWCC C++)
+      - [0x29CB70, cpp, beSelectCtrl]  # (propose_units)
+      - [0x29DEE0, cpp, beShadow01]  # (propose_units)
+      - [0x29E540, cpp, beSound]  # (propose_units)
+      - [0x29FC30, cpp, beSwitchCtrl]  # switch nodes on/off (MWCC C++)
+      - [0x29FD30, cpp, beSystem]  # frame timing, stage loading (MWCC C++)
+      - [0x2A0570, asm, text/3A0570]
+      - [0x2A1470, cpp, beWaterPlain]  # (propose_units)
+      - [0x2A17C0, cpp, beWeapon]  # (propose_units)
+      # libBecRuntimePlugin_getMeta, then ParticleTimer / ParticleArray (no be* prefix)
+      - [0x2A3840, asm, text/3A3840]
+      - [0x2A4930, cpp, beNumberCtrl]  # (propose_units)
+      - [0x2A52A0, cpp, beTimer]  # count-down timers that call Lua files (MWCC C++)
+      - [0x2A56B0, cpp, beStaticInfoCtl]  # list of static infos (MWCC C++)
+      - [0x2A59D0, cpp, beTargetObj]  # target search: nearest / facing player or enemy (MWCC C++)
+      - [0x2A6950, asm, text/3A6950]
+      - [0x2A8880, cpp, beMovie]  # (propose_units)
+      - [0x2A9220, cpp, beDBManager]  # data objects / database field access (MWCC C++)
+      - [0x2A9810, asm, text/3A9810]
+      - [0x2A99F0, cpp, beSaveMemoryObj]  # (propose_units) ends with beSvConnectCheck_getMeta
+      - [0x2ADF60, cpp, beSaveApi]  # save API objects (MWCC C++)
+      # beSaveMemoryObj_userInstantiate: the other half of beSaveMemoryObj, across beSaveApi
+      - [0x2AE640, asm, text/3AE640]
+      - [0x2AE7C0, cpp, beSaveUtil]  # (propose_units)
+      - [0x2AFE80, cpp, beMemory]  # memory display, empty (MWCC C++)
+      - [0x2AFF00, cpp, beLightCtrl]  # light colors (MWCC C++)
+      - [0x2B00E0, cpp, beTextureCtrl]  # texture swaps by name (MWCC C++)
+      - [0x2B04E0, asm, text/3B04E0]
+      # Meta registration of the Ndmw library: every class's _register / _registerFields,
+      # then getMeta / getElementType of the data-only classes, up to libNdmwRuntimePlugin_getMeta.
+      # Its helpers (func_003B0A10..) sit before it; the real start may be earlier.
+      - [0x2B18D0, cpp, libNdmwRuntimePlugin]
+      - [0x2CD4B0, cpp, beNDMWStageCtl]  # (propose_units)
+      - [0x2CDB00, cpp, beNDMWAfsSetup]  # (propose_units) includes beNDMWAfsStageLoad
+      - [0x2CFDC0, cpp, beNDMWPanelWaza]  # (propose_units) ends with beNDMWPanelObject* getMeta
+      - [0x2D1480, cpp, beNDMWMdlEBullet]  # enemy bullet models (MWCC C++)
+      - [0x2D16C0, cpp, beNDMWMdlEffect]  # effect models (MWCC C++)
+      - [0x2D1900, cpp, beNDMWMdlEnemy]  # enemy models (MWCC C++)
+      - [0x2D1D10, cpp, beNDMWMdlObject]  # object models (MWCC C++)
+      - [0x2D1FF0, cpp, beNDMWMdlPBullet]  # player bullet models (MWCC C++)
+      - [0x2D2230, cpp, beNDMWMdlPlayer]  # (propose_units) includes beNDMWMdlPlayer2
+      - [0x2D58F0, cpp, beNDMWStatus]  # (propose_units)
+      - [0x2E46B0, cpp, beNDMWLoadIntf2]  # (propose_units)
+      - [0x2F19E0, cpp, beNDMWLoadCtrl2]  # (propose_units)
+      - [0x2F2E00, cpp, beNDMWTitle2]  # (propose_units)
+      - [0x2F5410, cpp, beNDMWWindow]  # window helpers: text control messages (MWCC C++)
+      - [0x2F6620, cpp, beNDMWGameRam]  # GAMERAM: player data, stats, fight calculations (MWCC C++)
+      - [0x307080, cpp, beNDMWSaveCtrl]  # (propose_units)
+      - [0x308100, cpp, beNDMWSaveIntf]  # (propose_units) 110 KB: likely holds unnamed classes too
+      # beNDMWStatus* sub-objects (getMeta only so far), unclear units
+      - [0x323300, asm, text/423300]
+      - [0x330D20, asm, text/430D20]
+      - [0x34ABB0, cpp, alchemy/meta_igNonRefCountedViewList]  # meta registration (tools/meta_blocks.py)
+      - [0x34DF70, asm, text/44DF70]
+      - [0x34E260, cpp, alchemy/meta_igGuiSystem]  # meta registration (tools/meta_blocks.py)
+      - [0x34FFE0, asm, text/44FFE0]
+      - [0x3503F0, cpp, alchemy/meta_igGuiComponent]  # meta registration (tools/meta_blocks.py)
+      - [0x352B70, asm, text/452B70]
+      - [0x357F30, cpp, alchemy/meta_457F30]  # meta registration (tools/meta_blocks.py)
+      - [0x3583C0, asm, text/4583C0]
+      - [0x3586A0, cpp, meta_igViewerStatisticsManager]  # meta registration; igViewer is -O4,p like the game
+      - [0x359420, asm, text/459420]
+      - [0x359E40, cpp, meta_igViewerSceneInfoManager]  # meta registration; igViewer is -O4,p
+      - [0x35AB90, asm, text/45AB90]
+      - [0x35B0D0, cpp, meta_igViewerRenderer]  # meta registration; igViewer is -O4,p
+      - [0x35EC50, asm, text/45EC50]
+      # Padding + data. Includes code stored as data (0x481F28 area: payload the
+      # Sony SDK copies into kernel memory, refs 0x80075300), kept as raw bytes.
+      - [0x367120, bin, data]
+      # Lua's .rodata, one block per unit in link order (emitted by tools/mwsplice.py),
+      # linked in place among the data bins.
+      - { start: 0x3EAAB8, type: .rodata, name: lua/lapi, linker_section_order: .data }
+      - { start: 0x3EAB40, type: .rodata, name: lua/lib/lauxlib, linker_section_order: .data }
+      - { start: 0x3EABC8, type: .rodata, name: lua/lib/lbaselib, linker_section_order: .data }
+      - { start: 0x3EB1E0, type: .rodata, name: lua/lcode, linker_section_order: .data }
+      - { start: 0x3EB3B8, type: .rodata, name: lua/ldebug, linker_section_order: .data }
+      - { start: 0x3EB4E8, type: .rodata, name: lua/ldo, linker_section_order: .data }
+      - { start: 0x3EB550, type: .rodata, name: lua/llex, linker_section_order: .data }
+      - { start: 0x3EB840, type: .rodata, name: lua/lib/lmathlib, linker_section_order: .data }
+      - { start: 0x3EBA10, type: .rodata, name: lua/lmem, linker_section_order: .data }
+      - { start: 0x3EBA40, type: .rodata, name: lua/lobject, linker_section_order: .data }
+      - { start: 0x3EBB00, type: .rodata, name: lua/lparser, linker_section_order: .data }
+      - { start: 0x3EBE58, type: .rodata, name: lua/lstate, linker_section_order: .data }
+      - { start: 0x3EBE88, type: .rodata, name: lua/lib/lstrlib, linker_section_order: .data }
+      - { start: 0x3EC120, type: .rodata, name: lua/ltable, linker_section_order: .data }
+      - { start: 0x3EC168, type: .rodata, name: lua/ltm, linker_section_order: .data }
+      - { start: 0x3EC460, type: .rodata, name: lua/lundump, linker_section_order: .data }
+      - { start: 0x3EC680, type: .rodata, name: lua/lvm, linker_section_order: .data }
+      - [0x3EC870, bin, data_4EC870]
+      # C++ static initializers (16 functions), sitting between data blocks.
+      # Called through the .ctors-style pointer table at 0x522440 (walked by
+      # func_001029D0 from _start). linker_section_order keeps them in place.
+      - { start: 0x41FD00, type: asm, name: ctors/51FD00, linker_section_order: .data }
+      # Static-initializer pointer table (0x522440-0x522480) + rest of data.
+      - [0x422440, bin, data_522440]
+      - { start: 0x454B00, type: bss, vram: 0x00554B00 }
+  - [0x454B00]

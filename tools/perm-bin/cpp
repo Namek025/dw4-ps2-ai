@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stand-in for cpp: perm_setup.py already hands the permuter MWCC-preprocessed input.
+for a; do f="$a"; done
+cat "$f"
