@@ -128,6 +128,18 @@ def rodata_range(unit):
     return None
 
 
+def next_segment_start(unit):
+    """Rom offset of the segment after the unit, or None."""
+    import yaml
+    subs = yaml.safe_load(Path(SPLAT).read_text())["segments"][0]["subsegments"]
+    starts = [s[0] if isinstance(s, list) else s["start"] for s in subs]
+    for i, sub in enumerate(subs[:-1]):
+        name = sub[2] if isinstance(sub, list) and len(sub) >= 3 else None
+        if name == unit:
+            return starts[i + 1]
+    return None
+
+
 def include_asm_names(asm_dir):
     """Functions the unit's source still takes from asm."""
     unit = Path(asm_dir).relative_to("asm/nonmatchings")
@@ -337,6 +349,10 @@ def main():
                 lines.append(f"    .reloc ., {rel[i][0]}, {rel[i][1]}")
             lines.append(f"    .word 0x{w:08X}")
         lines += [f".size {p.stem}, . - {p.stem}", ".balign 16"]
+    # What follows may not be 16-aligned (zutil is followed by handwritten asm at 0x2252D8).
+    nxt = next_segment_start(str(Path(asm_dir).relative_to("asm/nonmatchings")))
+    if nxt is not None and nxt % 16 and lines[-1] == ".balign 16":
+        lines.pop()
     lines += block
     Path(out).write_text("\n".join(lines) + "\n")
 

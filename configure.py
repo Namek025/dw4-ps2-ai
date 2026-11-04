@@ -53,6 +53,20 @@ LUA_FLAGS = ("-c -O4,s -sdatathreshold 1 -str readonly -lang c++ -Cpp_exceptions
              " -I- -Iinclude/libc -Iinclude -Isrc/lua")
 
 
+# zlib 1.1.3 (src/zlib/, stock source): C, not C++, with `long` as 64 bits, and an older
+# compiler than the game's (with 3.0b52, crc32 and huft_build differ). Only what the linker
+# kept is in the rom; mwsplice drops the rest.
+ZLIB_DIR = Path("src/zlib")
+MWCC_B38 = "tools/mwcps2/3.0b38-030307/mwccps2.exe"
+ZLIB_FLAGS = "-c -O4,p -sdatathreshold 1 -lang c -I- -Iinclude/libc -Iinclude -Isrc/zlib"
+# libpng 1.0.8 (src/libpng/, stock source plus one `port:` line in png.h): same compiler,
+# configured through libpng's own macros (the game only reads PNGs).
+LIBPNG_DIR = Path("src/libpng")
+LIBPNG_FLAGS = ("-c -O4,p -sdatathreshold 1 -lang c -I- -Iinclude/libc -Iinclude -Isrc/libpng -Isrc/zlib"
+                " -DPNG_SETJMP_NOT_SUPPORTED -DPNG_USER_MEM_SUPPORTED -DPNG_NO_READ_iCCP"
+                " -DPNG_NO_WRITE_iCCP -DPNG_NO_PROGRESSIVE_READ")
+
+
 # Alchemy engine (src/alchemy/): Intrinsic's prebuilt libraries, same compiler as the game but
 # optimized for size (-O4,s, like Lua; with -O4,p a call before a branch target gets an extra nop).
 ALCHEMY_DIR = Path("src/alchemy")
@@ -62,6 +76,10 @@ ALCHEMY_FLAGS = "-c -O4,s -sdatathreshold 1 -lang c++ -Iinclude -I."
 def mwcc_flags(src: Path) -> str:
     if LUA_DIR in src.parents:
         return LUA_FLAGS + ("" if "lib" in src.parts else " -Dlong=int")
+    if ZLIB_DIR in src.parents:
+        return ZLIB_FLAGS
+    if LIBPNG_DIR in src.parents:
+        return LIBPNG_FLAGS
     if ALCHEMY_DIR in src.parents:
         return ALCHEMY_FLAGS
     return MWCC_FLAGS
@@ -120,13 +138,16 @@ def write_ninja() -> None:
         for p in (ROOT / "asm").rglob("*.s")
         if "nonmatchings" not in p.parts and "matchings" not in p.parts
     )
-    # MWCC units: C++ sources, plus Lua (.c files the game built as C++).
+    # MWCC units: C++ sources, plus Lua (.c files the game built as C++) and zlib.
+    mw_dirs = (LUA_DIR, ZLIB_DIR, LIBPNG_DIR)
     srcs = sorted(p.relative_to(ROOT) for p in (ROOT / "src").rglob("*.c")
-                  if LUA_DIR not in p.relative_to(ROOT).parents)
+                  if not any(d in p.relative_to(ROOT).parents for d in mw_dirs))
     cpps = sorted(p.relative_to(ROOT) for p in (ROOT / "src").rglob("*.c*")
-                  if p.suffix == ".cpp" or LUA_DIR in p.relative_to(ROOT).parents)
+                  if p.suffix == ".cpp" or any(d in p.relative_to(ROOT).parents for d in mw_dirs))
     lua_headers = " ".join(sorted(str(p.relative_to(ROOT)) for d in ("src/lua", "include/libc")
                                   for p in (ROOT / d).glob("*.h")))
+    zlib_headers = " ".join(sorted(str(p.relative_to(ROOT)) for d in ("src/zlib", "src/libpng", "include/libc")
+                                   for p in (ROOT / d).glob("*.h")))
     game_headers = " ".join(sorted(str(p.relative_to(ROOT)) for p in (ROOT / "include").glob("*.h")))
     bins = sorted(p.relative_to(ROOT) for p in (ROOT / "assets").rglob("*.bin"))
 
@@ -150,7 +171,7 @@ def write_ninja() -> None:
         "rule mwcc",
         # MWCC writes one .text section per function and can't do GNU-style
         # INCLUDE_ASM; mwsplice rebuilds the unit as one .s in address order.
-        f"  command = MWCIncludes=. {WIBO} {MWCC} $flags -o $out $in",
+        f"  command = MWCIncludes=. {WIBO} $mwcc $flags -o $out $in",
         "  description = MWCC $in",
         "",
         "rule mwsplice",
@@ -211,9 +232,11 @@ def write_ninja() -> None:
         asmdir = Path("asm") / "nonmatchings" / unit_name(c)
         inc = sorted((ROOT / asmdir).glob("*.s"))
         implicit = " ".join(str(p.relative_to(ROOT)) for p in inc)
-        headers = lua_headers if LUA_DIR in c.parents else game_headers
+        headers = (lua_headers if LUA_DIR in c.parents
+                   else zlib_headers if ZLIB_DIR in c.parents or LIBPNG_DIR in c.parents else game_headers)
         lines.append(f"build {mw}: mwcc {c} | include/include_asm.h {headers}")
         lines.append(f"  flags = {mwcc_flags(c)}")
+        lines.append(f"  mwcc = {MWCC_B38 if ZLIB_DIR in c.parents or LIBPNG_DIR in c.parents else MWCC}")
         lines.append(f"build {s}: mwsplice {mw} | tools/mwsplice.py config/symbol_addrs.txt config/splat.yaml {ROM_TARGET} {implicit}")
         lines.append(f"  asmdir = {asmdir}")
         lines.append(f"build {o}: as {s} | {implicit}")

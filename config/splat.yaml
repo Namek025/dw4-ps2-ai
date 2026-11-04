@@ -96,7 +96,28 @@ segments:
       - [0x0E5DE0, asm, text/1E5DE0]
       - [0x0E7050, cpp, alchemy/meta_1E7050]  # meta registration (tools/meta_blocks.py)
       - [0x0E7450, asm, text/1E7450]
-      - [0x110500, asm, text/210500]
+      - [0x10E750, c, libpng/png]  # libpng 1.0.8, stock source (src/libpng)
+      - [0x10F070, c, libpng/pngerror]
+      - [0x10F340, c, libpng/pngget]
+      - [0x10F610, c, libpng/pngmem]
+      - [0x10F930, c, libpng/pngread]
+      - [0x110DF0, c, libpng/pngrio]
+      - [0x110F20, c, libpng/pngrtran]
+      - [0x11AA30, c, libpng/pngrutil]
+      - [0x11F0F0, c, libpng/pngset]
+      - [0x120370, c, libpng/pngtrans]
+      - [0x121670, asm, text/221670]
+      - [0x121870, c, zlib/adler32]  # zlib 1.1.3, stock source (src/zlib)
+      - [0x121A10, c, zlib/crc32]
+      - [0x121BF0, c, zlib/deflate]
+      - [0x121D10, c, zlib/infblock]
+      - [0x122E90, c, zlib/infcodes]
+      - [0x123990, c, zlib/inffast]
+      - [0x123EC0, c, zlib/inflate]
+      - [0x124780, c, zlib/inftrees]
+      - [0x1250E0, c, zlib/infutil]
+      - [0x1252A0, c, zlib/zutil]
+      - [0x1252D8, asm, text/2252D8]
       - [0x125870, cpp, alchemy/meta_igCompoundList]  # meta registration (tools/meta_blocks.py)
       - [0x1284A0, asm, text/2284A0]
       - [0x128900, cpp, alchemy/meta_igItemBase]  # meta registration (tools/meta_blocks.py)

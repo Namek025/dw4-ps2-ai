@@ -19,6 +19,8 @@ What that means for you:
 - A matching function is proven to compile to the original bytes. That says nothing about how
   readable it is, and it does not prove every name or type is right.
 - Many functions and fields still have placeholder names (`func_XXXXXXXX`, `unk1C`).
+- `src/lua/`, `src/zlib/` and `src/libpng/` are the libraries' original source, with small changes
+  marked `port:`. Those weren't written by the agent.
 - Functions under `#ifdef NON_MATCHING` do not match: the build uses the original asm for them.
 
 ## Progress
@@ -28,11 +30,11 @@ Share of `.text` bytes decompiled, from `tools/progress.py`:
 | Region | Done | Size |
 |---|---|---|
 | Game (`be*`) | 35.8% | 936 KB |
-| Alchemy engine | 18.1% | 1977 KB |
+| Alchemy engine, zlib and libpng | 22.8% | 1977 KB |
 | Lua 4.0.1 | 99.5% | 75 KB |
 | CRI middleware | 0.9% | 380 KB |
 | Sony SDK and libc | 0% | 197 KB |
-| **Total** | **21.6%** | 3568 KB |
+| **Total** | **24.2%** | 3568 KB |
 
 The Sony and CRI code is the lowest priority, because a PC port would replace it. The build
 reproduces the program's code and data, but not yet the full ELF file (header and sections).
@@ -63,6 +65,10 @@ chmod +x tools/wibo
 mkdir -p tools/mwcps2/3.0b52-030722
 curl -L https://github.com/decompme/compilers/releases/download/compilers/mwcps2-3.0b52-030722.tar.gz \
   | tar -xz -C tools/mwcps2/3.0b52-030722
+
+# MWCC 3.0b38 (zlib and libpng were built with this older version).
+mkdir -p tools/mwcps2/3.0b38-030307
+curl -L https://github.com/decompme/compilers/releases/download/compilers/mwcps2-3.0b38-030307.tar.gz \n  | tar -xz -C tools/mwcps2/3.0b38-030307
 
 # objdiff CLI (per-function diff against the original).
 curl -Lo tools/objdiff-cli https://github.com/encounter/objdiff/releases/download/v3.8.2/objdiff-cli-linux-x86_64
@@ -110,4 +116,5 @@ Open an issue on this repository, or find me on Discord: `namek`.
 
 Unofficial fan project, not affiliated with the game's rights holders. Digimon, Digimon World 4
 and related names belong to their respective owners. This repository grants no license for the
-reconstructed game and engine code. Lua 4.0.1 keeps its own license: see `src/lua/COPYRIGHT`.
+reconstructed game and engine code. Third-party libraries keep their own licenses: Lua 4.0.1
+(`src/lua/COPYRIGHT`), zlib 1.1.3 (`src/zlib/zlib.h`) and libpng 1.0.8 (`src/libpng/png.h`).

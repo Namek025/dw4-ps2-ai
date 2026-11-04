@@ -101,6 +101,14 @@ unit per file (plus a few `port:` changes); 430/431 functions match (`docs/lua.m
 in `configure.py` (`ALCHEMY_DIR`). C++ exceptions stay on; a tail call (`j`) needs
 `#pragma exceptions off` around that one function.
 
+**zlib 1.1.3 (`0x221870`-`0x2252D8`, `src/zlib/`) and libpng 1.0.8 (`0x20E750`-`0x221670`, `src/libpng/`) are stock
+source built with MWCC 3.0b38, not 3.0b52**: `-O4,p -lang c` (flags per path in `configure.py`). zlib uses a 64-bit
+`long`; libpng a 32-bit one (`#define long int` after `zlib.h`, a `port:` line in `png.h`). libpng's configuration:
+`PNG_SETJMP_NOT_SUPPORTED`, `PNG_USER_MEM_SUPPORTED`, `PNG_NO_READ_iCCP`, `PNG_NO_WRITE_iCCP`, `PNG_NO_PROGRESSIVE_READ`,
+and read interlacing removed from `pngconf.h` (`port:`). All 23 + 124 linked functions match. For third-party code,
+try the stock source against the rom (`0x100000`-based address order follows the library's file order) and vary
+the compiler version before touching the source.
+
 Still open: flags for the Sony SDK libs (`0x102000`–`0x126000` region, strings `PsIIlib*2800`).
 
 ### Alchemy reflection data (found 2026-10-25)
